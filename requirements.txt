@@ -1,0 +1,55 @@
+# ── Web Framework ─────────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+python-multipart
+websockets
+
+# ── Database ──────────────────────────────────────────────────────────────────
+sqlalchemy
+aiosqlite
+alembic
+greenlet
+
+# ── Rate Limiting ─────────────────────────────────────────────────────────────
+slowapi
+
+# ── Real-Time Streaming ───────────────────────────────────────────────────────
+watchdog
+scapy
+pyshark
+
+# ── Security & Auth ───────────────────────────────────────────────────────────
+cryptography
+python-jose[cryptography]
+pycryptodome
+bcrypt
+
+# ── Data Processing ───────────────────────────────────────────────────────────
+pandas
+numpy
+
+# ── Validation & Config ───────────────────────────────────────────────────────
+pydantic
+pydantic-settings
+email-validator
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv
+pyyaml
+pytz
+python-dateutil
+httpx
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest
+pytest-asyncio
+pytest-cov
+
+# ── Development ───────────────────────────────────────────────────────────────
+black
+flake8
+mypy
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+structlog
+colorama

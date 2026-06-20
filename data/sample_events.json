@@ -1,0 +1,108 @@
+{
+  "scenarios": [
+    {
+      "id": "brute_force",
+      "name": "Brute Force Attack",
+      "description": "Simulates a brute force attack on SSH service",
+      "events": [
+        {
+          "timestamp": "2026-02-11T10:00:00",
+          "type": "log",
+          "severity": "info",
+          "source": "ssh",
+          "message": "Failed login attempt from 192.168.1.100"
+        },
+        {
+          "timestamp": "2026-02-11T10:00:05",
+          "type": "log",
+          "severity": "warning",
+          "source": "ssh",
+          "message": "Failed login attempt from 192.168.1.100"
+        },
+        {
+          "timestamp": "2026-02-11T10:00:10",
+          "type": "alert",
+          "severity": "high",
+          "title": "Multiple Failed Login Attempts",
+          "description": "Detected multiple failed login attempts from same IP",
+          "source": "ids"
+        },
+        {
+          "timestamp": "2026-02-11T10:00:15",
+          "type": "incident",
+          "severity": "high",
+          "title": "Potential Brute Force Attack",
+          "description": "Brute force attack detected on SSH service",
+          "incident_type": "unauthorized_access"
+        }
+      ]
+    },
+    {
+      "id": "data_exfiltration",
+      "name": "Data Exfiltration",
+      "description": "Simulates data exfiltration attempt",
+      "events": [
+        {
+          "timestamp": "2026-02-11T11:00:00",
+          "type": "log",
+          "severity": "info",
+          "source": "network",
+          "message": "Large outbound data transfer detected"
+        },
+        {
+          "timestamp": "2026-02-11T11:00:30",
+          "type": "alert",
+          "severity": "critical",
+          "title": "Suspicious Data Transfer",
+          "description": "Unusual volume of data sent to external IP",
+          "source": "dlp"
+        },
+        {
+          "timestamp": "2026-02-11T11:01:00",
+          "type": "incident",
+          "severity": "critical",
+          "title": "Data Exfiltration Attempt",
+          "description": "Potential data breach detected",
+          "incident_type": "data_breach"
+        }
+      ]
+    },
+    {
+      "id": "malware_infection",
+      "name": "Malware Infection",
+      "description": "Simulates malware infection scenario",
+      "events": [
+        {
+          "timestamp": "2026-02-11T12:00:00",
+          "type": "log",
+          "severity": "warning",
+          "source": "antivirus",
+          "message": "Suspicious file detected: trojan.exe"
+        },
+        {
+          "timestamp": "2026-02-11T12:00:15",
+          "type": "alert",
+          "severity": "critical",
+          "title": "Malware Detected",
+          "description": "Known malware signature found",
+          "source": "antivirus"
+        },
+        {
+          "timestamp": "2026-02-11T12:00:30",
+          "type": "log",
+          "severity": "critical",
+          "source": "network",
+          "message": "C2 communication detected to known malicious IP"
+        },
+        {
+          "timestamp": "2026-02-11T12:01:00",
+          "type": "incident",
+          "severity": "critical",
+          "title": "Malware Infection",
+          "description": "Active malware infection with C2 communication",
+          "incident_type": "malware"
+        }
+      ]
+    }
+  ]
+}

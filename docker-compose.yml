@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: soc-backend
+    ports:
+      - "127.0.0.1:8000:8000"   # bind to localhost only — not 0.0.0.0
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    # NET_RAW required for Scapy packet capture.
+    # Remove if you do not need live packet sniffing — reduces attack surface.
+    cap_add:
+      - NET_RAW
+    # REMOVED: network_mode: host — gave container full access to host network stack.
+    # Use explicit port mapping above instead.
+    networks:
+      - soc-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: soc-frontend
+    ports:
+      - "127.0.0.1:3000:3000"   # bind to localhost only
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_WS_URL=ws://localhost:8000
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - soc-network
+    restart: unless-stopped
+
+networks:
+  soc-network:
+    driver: bridge
+
+volumes:
+  soc-data:
