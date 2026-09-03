@@ -1,0 +1,31 @@
+[build]
+  base = "frontend"
+  command = "npm install && npm run build"
+  publish = "build"
+
+[functions]
+  directory = "../netlify/functions"
+
+[build.environment]
+  CI = "false"
+  REACT_APP_API_URL = ""
+
+[[redirects]]
+  from = "/api/auth/login"
+  to = "/.netlify/functions/auth-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/me"
+  to = "/.netlify/functions/auth-me"
+  status = 200
+
+[[redirects]]
+  from = "/api/*"
+  to = "/index.html"
+  status = 404
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
