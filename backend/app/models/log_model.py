@@ -48,6 +48,12 @@ class LogBase(BaseModel):
 
 class LogCreate(LogBase):
     """Schema for manually creating a log entry via POST /api/logs."""
+    # SECURITY FIX: bound and validate client-supplied fields
+    source:     str           = Field(..., min_length=1, max_length=255)
+    severity:   str           = Field(..., pattern="^(info|warning|error|critical|low|medium|high)$")
+    message:    str           = Field(..., min_length=1, max_length=10000)
+    raw_data:   Optional[str] = Field(None, max_length=50000)
+    ip_address: Optional[str] = Field(None, max_length=64)
     timestamp: Optional[datetime] = Field(None, description="Override timestamp (defaults to now)")
 
 

@@ -17,6 +17,7 @@ try:
     from slowapi import Limiter, _rate_limit_exceeded_handler
     from slowapi.util import get_remote_address
     from slowapi.errors import RateLimitExceeded
+    from slowapi.middleware import SlowAPIMiddleware
     _RATE_LIMIT_AVAILABLE = True
 except ImportError:
     _RATE_LIMIT_AVAILABLE = False
@@ -97,12 +98,43 @@ app = FastAPI(
     description="Offline Security Operations Center — real-time host & network monitoring",
     version="4.0.0",
     lifespan=lifespan,
+    # SECURITY FIX: don't publish the interactive API schema outside debug mode
+    docs_url="/docs" if settings.DEBUG else None,
+    redoc_url="/redoc" if settings.DEBUG else None,
+    openapi_url="/openapi.json" if settings.DEBUG else None,
 )
 
 # Rate limiting (only if slowapi is installed)
 if _RATE_LIMIT_AVAILABLE:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    # SECURITY FIX: default_limits are only enforced by the middleware — without
+    # it the 200/minute limit above was never applied.
+    app.add_middleware(SlowAPIMiddleware)
+
+
+# SECURITY FIX: standard hardening headers on every HTTP response
+_SECURITY_HEADERS = {
+    "X-Content-Type-Options":  "nosniff",
+    "X-Frame-Options":         "DENY",
+    "Referrer-Policy":         "no-referrer",
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+    "Cache-Control":           "no-store",
+    "Permissions-Policy":      "geolocation=(), microphone=(), camera=()",
+}
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    for header, value in _SECURITY_HEADERS.items():
+        # Swagger/ReDoc (debug only) load assets from a CDN — skip the strict CSP there
+        if header == "Content-Security-Policy" and request.url.path in ("/docs", "/redoc"):
+            continue
+        response.headers.setdefault(header, value)
+    if request.url.scheme == "https":
+        response.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
 
 # CORS
 # SECURITY FIX: wildcard methods/headers removed. allow_credentials=True combined

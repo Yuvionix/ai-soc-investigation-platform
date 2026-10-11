@@ -1,6 +1,7 @@
 """
 Feedback service for business logic
 """
+from datetime import datetime
 from typing import List, Optional
 
 from app.models.feedback_model import FeedbackCreate, FeedbackResponse
@@ -22,7 +23,7 @@ class FeedbackService:
     async def create_feedback(self, feedback: FeedbackCreate) -> FeedbackResponse:
         """Create new feedback entry"""
         # TODO: Implement database insert
-        return FeedbackResponse(id=1, **feedback.dict())
+        return FeedbackResponse(id=1, created_at=datetime.now(), **feedback.model_dump())
     
     async def get_feedback_by_alert(self, alert_id: int) -> List[FeedbackResponse]:
         """Get feedback for a specific alert"""

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.services.incident_service import IncidentService
 from app.models.incident_model import IncidentResponse, IncidentCreate, IncidentUpdate
 from app.api.auth import get_current_user, require_admin
@@ -12,8 +12,8 @@ router = APIRouter()
 
 
 class NoteCreate(BaseModel):
-    author: str = "Analyst"
-    note: str
+    author: str = Field("Analyst", max_length=255)
+    note: str = Field(..., min_length=1, max_length=10000)
 
 
 @router.get("", response_model=List[IncidentResponse])

@@ -6,10 +6,12 @@ SECURITY FIXES applied:
     Query param tokens are logged by every proxy, web server, and browser history.
   - get_current_user() dependency created for reuse across all protected routes.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
-from app.services.auth_service import authenticate_user, create_access_token, decode_token, _USERS
+from pydantic import BaseModel, Field
+from app.services.auth_service import (
+    authenticate_user, create_access_token, decode_token, is_locked_out, _USERS,
+)
 
 router  = APIRouter()
 _bearer = HTTPBearer(auto_error=False)
@@ -60,8 +62,8 @@ def require_admin(user: dict = Depends(get_current_user)) -> dict:
 # ── Request / Response models ─────────────────────────────────────────────────
 
 class LoginRequest(BaseModel):
-    username: str
-    password: str
+    username: str = Field(..., min_length=1, max_length=64)
+    password: str = Field(..., min_length=1, max_length=256)
 
 
 class TokenResponse(BaseModel):
@@ -75,8 +77,15 @@ class TokenResponse(BaseModel):
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @router.post("/login", response_model=TokenResponse)
-async def login(body: LoginRequest):
-    user = authenticate_user(body.username, body.password)
+async def login(body: LoginRequest, request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    # SECURITY FIX: lock out repeated failures per username and per IP
+    if is_locked_out(body.username, client_ip):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many failed login attempts. Try again later.",
+        )
+    user = authenticate_user(body.username, body.password, client_ip)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
