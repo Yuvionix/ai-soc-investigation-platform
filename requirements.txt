@@ -20,7 +20,7 @@ pyshark
 
 # ── Security & Auth ───────────────────────────────────────────────────────────
 cryptography
-python-jose[cryptography]
+PyJWT>=2.8.0
 pycryptodome
 bcrypt
 

@@ -10,10 +10,10 @@ class FeedbackBase(BaseModel):
     """Base feedback model"""
     alert_id: Optional[int] = Field(None, description="Related alert ID")
     incident_id: Optional[int] = Field(None, description="Related incident ID")
-    feedback_type: str = Field(..., description="Type of feedback (false_positive, true_positive, improvement)")
+    feedback_type: str = Field(..., min_length=1, max_length=50, description="Type of feedback (false_positive, true_positive, improvement)")
     rating: Optional[int] = Field(None, ge=1, le=5, description="Rating 1-5")
-    comments: str = Field(..., description="Feedback comments")
-    analyst_name: Optional[str] = Field(None, description="Analyst name")
+    comments: str = Field(..., min_length=1, max_length=5000, description="Feedback comments")
+    analyst_name: Optional[str] = Field(None, max_length=255, description="Analyst name")
 
 
 class FeedbackCreate(FeedbackBase):
